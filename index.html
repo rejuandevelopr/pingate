@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PinGate — The Global Communication Gatekeeper</title>
+  <meta name="description" content="PinGate — a paradigm shift in how the world connects. Your time is currency. Confidential project in development."/>
+  <meta property="og:title" content="PinGate — The Global Communication Gatekeeper"/>
+  <meta property="og:description" content="Access is no longer free. Attention is no longer cheap. Your time is currency."/>
+  <meta name="theme-color" content="#0A0A0A"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0A0A0A; --text:#FFFFFF; --muted:#D7D9DC;
+      --gold:#CDA349; --gold-deep:#B48E3A; --shadow:rgba(205,163,73,.35);
+      --panel:#0E0F11; --field:#121317; --border:rgba(255,255,255,.16);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:"Montserrat",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      line-height:1.35;
+    }
+    .wrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6vh 4vw; position:relative; overflow:hidden}
+    .wrap::after{
+      content:""; position:absolute; inset:-20vmax; pointer-events:none;
+      background:
+        radial-gradient(70% 50% at 50% 35%, rgba(255,255,255,.08) 0%, rgba(255,255,255,.02) 30%, rgba(0,0,0,0) 70%),
+        radial-gradient(80% 60% at 50% 120%, rgba(205,163,73,.08) 0%, rgba(0,0,0,0) 60%);
+      filter:blur(20px);
+    }
+    header{position:absolute; top:24px; left:0; right:0; padding:0 4vw; display:flex; align-items:center; justify-content:space-between}
+    .brand{letter-spacing:.12em; font-weight:800; font-size:14px; text-transform:uppercase}
+    .tm{opacity:.85; font-weight:700}
+    .lang-btn{
+      background:transparent; color:var(--text); border:1px solid var(--border);
+      padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px;
+      transition:all .18s ease;
+    }
+    .lang-btn:hover{ border-color:var(--gold); box-shadow:0 0 0 3px var(--shadow) }
+    main{width:100%; max-width:1000px; text-align:center; display:grid; gap:2.2rem; animation:fadeUp .9s ease both}
+    @keyframes fadeUp{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+    .strap{font-size:14px; opacity:.85; letter-spacing:.18em; text-transform:uppercase}
+    .hero{font-weight:800; font-size:clamp(28px,6vw,64px); letter-spacing:.01em}
+    .gold{color:var(--gold)}
+    .lines{display:grid; gap:.6rem; opacity:.92; font-size:clamp(14px,2.2vw,20px)}
+    .meta{opacity:.75; font-size:13px}
+    .cta{display:flex; gap:14px; align-items:center; justify-content:center; margin-top:.6rem}
+    .btn{
+      appearance:none; cursor:pointer; padding:14px 20px; border-radius:14px; font-weight:700; font-size:14px;
+      border:1px solid var(--border); background:transparent; color:var(--text); letter-spacing:.02em; transition:all .18s ease;
+    }
+    .btn.primary{border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold-deep)}
+    .btn.primary:hover{transform:translateY(-1px); box-shadow:inset 0 0 0 1px var(--gold), 0 6px 22px -8px var(--shadow)}
+    .footer-tag{position:absolute; bottom:26px; left:0; right:0; text-align:center; opacity:.75; font-size:12px; letter-spacing:.08em}
+
+    /* Language Panel */
+    .panel{
+      position:fixed; inset:auto 16px 16px auto; width:min(92vw,360px);
+      background:var(--panel); border:1px solid var(--border); border-radius:14px;
+      box-shadow:0 12px 40px rgba(0,0,0,.5); padding:12px; display:none; z-index:30;
+    }
+    .panel.open{display:block}
+    .panel h3{margin:6px 8px 10px; font-size:13px; opacity:.8; letter-spacing:.08em; text-transform:uppercase}
+    .langs{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+    .lang{
+      background:var(--field); color:var(--text); border:1px solid var(--border);
+      padding:10px 12px; border-radius:10px; font-size:13px; cursor:pointer;
+    }
+    .lang:hover{border-color:var(--gold)}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:40; padding:20px}
+    .modal.open{display:flex}
+    .card{width:min(640px,92vw); background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 22px 18px; box-shadow:0 20px 60px rgba(0,0,0,.6); position:relative}
+    .x{position:absolute; top:10px; right:12px; background:transparent; border:none; color:#fff; font-size:24px; opacity:.75; cursor:pointer}
+    .x:hover{opacity:1}
+    .card h3{margin:4px 0 0; font-size:20px}
+    .sub{opacity:.78; font-size:14px; margin:6px 0 16px}
+    .label{display:block; font-size:12px; opacity:.85; margin:12px 0 6px; letter-spacing:.04em}
+    .input, .textarea{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--field); color:#fff; font-size:14px;
+    }
+    .textarea{min-height:100px; resize:vertical}
+    .input:focus, .textarea:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(205,163,73,.22)}
+    .submit{margin-top:16px; width:100%; padding:14px 16px; border-radius:14px; font-weight:700; font-size:14px; color:#fff; background:transparent; border:1px solid var(--gold); box-shadow:inset 0 0 0 1px var(--gold-deep)}
+    .submit:hover{transform:translateY(-1px); box-shadow:inset 0 0 0 1px var(--gold), 0 6px 22px -8px var(--shadow)}
+    .msg{min-height:20px; font-size:13px; margin-top:10px; opacity:.9}
+
+    @media (max-width:520px){
+      header{top:16px}
+      .strap{font-size:12px}
+      .brand{font-size:12px}
+      .lang-btn{padding:8px 12px; font-size:12px}
+      .btn{padding:12px 16px; font-size:13px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="wrap">
+    <header>
+      <div class="brand">PIN GATE<span class="tm">™</span></div>
+      <button class="lang-btn" id="openLang" aria-haspopup="true" aria-expanded="false">🌐 Change Language</button>
+    </header>
+
+    <main aria-live="polite">
+      <div class="strap" id="strap">THE GLOBAL COMMUNICATION GATEKEEPER</div>
+      <h1 class="hero" id="hero">YOUR TIME. <br><span class="gold">GUARDED.</span></h1>
+
+      <section class="lines">
+        <div id="l1">A new frontier in digital communication.</div>
+        <div id="l2">Not another filter. Not another inbox.</div>
+        <div id="l3">A <span class="gold">paradigm shift</span> in how the world connects.</div>
+        <div id="l4">Access is no longer free. Attention is no longer cheap.</div>
+        <div id="l5">Your time is <span class="gold">currency</span>.</div>
+        <div class="meta" id="meta1">Confidential project in development. Launching soon.</div>
+      </section>
+
+      <div class="cta">
+        <button class="btn primary" id="openEA">Request Early Access</button>
+      </div>
+    </main>
+
+    <footer class="footer-tag" id="tagline">World’s Gatekeeper</footer>
+
+    <!-- Language Panel -->
+    <div class="panel" id="langPanel" role="dialog" aria-label="Select language">
+      <h3>Select Language</h3>
+      <div class="langs">
+        <button class="lang" data-lang="en">English</button>
+        <button class="lang" data-lang="es">Español</button>
+        <button class="lang" data-lang="fr">Français</button>
+        <button class="lang" data-lang="de">Deutsch</button>
+        <button class="lang" data-lang="it">Italiano</button>
+        <button class="lang" data-lang="pt">Português</button>
+        <button class="lang" data-lang="zh">简体中文</button>
+        <button class="lang" data-lang="ja">日本語</button>
+        <button class="lang" data-lang="ar">العربية</button>
+        <button class="lang" data-lang="he">עברית</button>
+        <button class="lang" data-lang="hi">हिन्दी</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Early Access Modal -->
+  <div id="eaModal" class="modal" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="eaTitle">
+      <button class="x" id="eaClose" aria-label="Close">×</button>
+      <h3 id="eaTitle">Request Early Access</h3>
+      <p class="sub" id="eaSub">You’re one step closer to the future of communication. Only a select group will be invited to experience PinGate first.</p>
+
+      <form id="eaForm" action="https://formspree.io/f/xqalryda" method="POST" novalidate>
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="_subject" value="PinGate Early Access Request">
+        <input type="hidden" name="_ref" value="pingate.com">
+
+        <label class="label" for="name" id="labName">Name</label>
+        <input class="input" id="name" name="name" type="text" required placeholder="Your name"/>
+
+        <label class="label" for="email" id="labEmail">Email</label>
+        <input class="input" id="email" name="email" type="email" required placeholder="you@example.com"/>
+
+        <label class="label" for="org" id="labOrg">Organization (optional)</label>
+        <input class="input" id="org" name="organization" type="text" placeholder="Investor, Founder, Exec…"/>
+
+        <label class="label" for="why" id="labWhy">Why do you want early access? (optional)</label>
+        <textarea class="textarea" id="why" name="reason" placeholder="A sentence or two…"></textarea>
+
+        <button class="submit" type="submit" id="btnSubmit">Submit Request</button>
+        <div id="eaMsg" class="msg" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <noscript><style>.modal{display:none!important}</style></noscript>
+
+  <script>
+    // i18n strings (11 languages)
+    const strings = {
+      en:{strap:"THE GLOBAL COMMUNICATION GATEKEEPER",heroL:"YOUR TIME. ",heroG:"GUARDED.",l1:"A new frontier in digital communication.",l2:"Not another filter. Not another inbox.",l3a:"A ",l3g:"paradigm shift",l3b:" in how the world connects.",l4:"Access is no longer free. Attention is no longer cheap.",l5a:"Your time is ",l5g:"currency",l5b:".",meta:"Confidential project in development. Launching soon.",cta:"Request Early Access",tag:"World’s Gatekeeper",modalTitle:"Request Early Access",modalSub:"You’re one step closer to the future of communication. Only a select group will be invited to experience PinGate first.",labName:"Name",labEmail:"Email",labOrg:"Organization (optional)",labWhy:"Why do you want early access? (optional)",submit:"Submit Request",dir:"ltr"},
+      es:{strap:"EL GUARDIÁN GLOBAL DE LA COMUNICACIÓN",heroL:"TU TIEMPO. ",heroG:"PROTEGIDO.",l1:"Una nueva frontera en la comunicación digital.",l2:"No es otro filtro. No es otra bandeja de entrada.",l3a:"Un ",l3g:"cambio de paradigma",l3b:" en cómo se conecta el mundo.",l4:"El acceso ya no es gratis. La atención ya no es barata.",l5a:"Tu tiempo es ",l5g:"moneda",l5b:".",meta:"Proyecto confidencial en desarrollo. Lanzamiento pronto.",cta:"Solicitar acceso anticipado",tag:"El guardián del mundo",modalTitle:"Solicitar acceso anticipado",modalSub:"Estás a un paso del futuro de la comunicación. Solo un grupo selecto será invitado a probar PinGate primero.",labName:"Nombre",labEmail:"Correo electrónico",labOrg:"Organización (opcional)",labWhy:"¿Por qué quieres acceso anticipado? (opcional)",submit:"Enviar solicitud",dir:"ltr"},
+      fr:{strap:"LE GARDIEN MONDIAL DES COMMUNICATIONS",heroL:"VOTRE TEMPS. ",heroG:"PROTÉGÉ.",l1:"Une nouvelle frontière de la communication numérique.",l2:"Pas un autre filtre. Pas une autre boîte de réception.",l3a:"Un ",l3g:"changement de paradigme",l3b:" dans la façon dont le monde se connecte.",l4:"L’accès n’est plus gratuit. L’attention n’est plus bon marché.",l5a:"Votre temps est une ",l5g:"monnaie",l5b:".",meta:"Projet confidentiel en développement. Lancement prochain.",cta:"Demander un accès anticipé",tag:"Le gardien du monde",modalTitle:"Demander un accès anticipé",modalSub:"Vous êtes à un pas du futur des communications. Un groupe restreint sera invité à découvrir PinGate en premier.",labName:"Nom",labEmail:"E-mail",labOrg:"Organisation (facultatif)",labWhy:"Pourquoi l’accès anticipé ? (facultatif)",submit:"Envoyer la demande",dir:"ltr"},
+      de:{strap:"DER GLOBALE TORWÄCHTER DER KOMMUNIKATION",heroL:"DEINE ZEIT. ",heroG:"GESCHÜTZT.",l1:"Eine neue Grenze der digitalen Kommunikation.",l2:"Kein weiterer Filter. Kein weiterer Posteingang.",l3a:"Ein ",l3g:"Paradigmenwechsel",l3b:" in der Art, wie die Welt kommuniziert.",l4:"Zugang ist nicht mehr frei. Aufmerksamkeit ist nicht mehr billig.",l5a:"Deine Zeit ist ",l5g:"Währung",l5b:".",meta:"Vertrauliches Projekt in Entwicklung. Baldiger Start.",cta:"Frühzugang anfordern",tag:"Torwächter der Welt",modalTitle:"Frühzugang anfordern",modalSub:"Du bist nur einen Schritt von der Zukunft der Kommunikation entfernt. Nur eine ausgewählte Gruppe wird eingeladen, PinGate zuerst zu erleben.",labName:"Name",labEmail:"E-Mail",labOrg:"Organisation (optional)",labWhy:"Warum Frühzugang? (optional)",submit:"Anfrage senden",dir:"ltr"},
+      it:{strap:"IL GUARDIANO GLOBALE DELLA COMUNICAZIONE",heroL:"IL TUO TEMPO. ",heroG:"PROTETTO.",l1:"Una nuova frontiera nella comunicazione digitale.",l2:"Non un altro filtro. Non un’altra casella di posta.",l3a:"Un ",l3g:"cambio di paradigma",l3b:" nel modo in cui il mondo si connette.",l4:"L’accesso non è più gratuito. L’attenzione non è più a buon mercato.",l5a:"Il tuo tempo è ",l5g:"valuta",l5b:".",meta:"Progetto confidenziale in fase di sviluppo. Lancio imminente.",cta:"Richiedi accesso anticipato",tag:"Il guardiano del mondo",modalTitle:"Richiedi accesso anticipato",modalSub:"Sei a un passo dal futuro della comunicazione. Solo un gruppo selezionato sarà invitato a provare PinGate per primo.",labName:"Nome",labEmail:"Email",labOrg:"Organizzazione (opzionale)",labWhy:"Perché vuoi l’accesso anticipato? (opzionale)",submit:"Invia richiesta",dir:"ltr"},
+      pt:{strap:"O GUARDIÃO GLOBAL DA COMUNICAÇÃO",heroL:"SEU TEMPO. ",heroG:"PROTEGIDO.",l1:"Uma nova fronteira na comunicação digital.",l2:"Não é outro filtro. Não é outra caixa de entrada.",l3a:"Uma ",l3g:"mudança de paradigma",l3b:" em como o mundo se conecta.",l4:"O acesso não é mais gratuito. A atenção não é mais barata.",l5a:"Seu tempo é ",l5g:"moeda",l5b:".",meta:"Projeto confidencial em desenvolvimento. Lançamento em breve.",cta:"Solicitar acesso antecipado",tag:"O guardião do mundo",modalTitle:"Solicitar acesso antecipado",modalSub:"Você está a um passo do futuro da comunicação. Apenas um grupo seleto será convidado a experimentar o PinGate primeiro.",labName:"Nome",labEmail:"E-mail",labOrg:"Organização (opcional)",labWhy:"Por que deseja acesso antecipado? (opcional)",submit:"Enviar pedido",dir:"ltr"},
+      zh:{strap:"全球通信的守门人",heroL:"你的时间。",heroG:"被守护。",l1:"数字通信的新前沿。",l2:"不是另一个过滤器。不是另一个收件箱。",l3a:"世界连接方式的",l3g:"范式转变",l3b:"。",l4:"访问不再免费。注意力不再廉价。",l5a:"你的时间就是",l5g:"货币",l5b:"。",meta:"保密项目开发中。即将推出。",cta:"申请提前访问",tag:"世界的守门人",modalTitle:"申请提前访问",modalSub:"你距离通信的未来只有一步之遥。只有少数人会被邀请率先体验 PinGate。",labName:"姓名",labEmail:"邮箱",labOrg:"组织（可选）",labWhy:"为什么想要提前访问？（可选）",submit:"提交申请",dir:"ltr"},
+      ja:{strap:"世界的コミュニケーションの門番",heroL:"あなたの時間。",heroG:"守られる。",l1:"デジタルコミュニケーションの新たなフロンティア。",l2:"もう一つのフィルターではない。もう一つの受信箱ではない。",l3a:"世界のつながり方における",l3g:"パラダイムシフト",l3b:"。",l4:"アクセスはもはや無料ではない。注意はもはや安くない。",l5a:"あなたの時間は",l5g:"通貨",l5b:"です。",meta:"機密プロジェクト進行中。近日公開。",cta:"早期アクセスをリクエスト",tag:"世界の門番",modalTitle:"早期アクセスをリクエスト",modalSub:"あなたは通信の未来に一歩近づいています。選ばれた一部の人々だけが PinGate を最初に体験できます。",labName:"名前",labEmail:"メール",labOrg:"組織（任意）",labWhy:"なぜ早期アクセスが欲しいですか？（任意）",submit:"リクエスト送信",dir:"ltr"},
+      ar:{strap:"حارس بوابة الاتصالات العالمي",heroL:"وقتك. ",heroG:"محمي.",l1:"حدود جديدة في الاتصال الرقمي.",l2:"ليس فلترًا آخر. ليست صندوق وارد آخر.",l3a:"",l3g:"تحول جذري",l3b:" في كيفية اتصال العالم.",l4:"الوصول لم يعد مجانيًا. الانتباه لم يعد رخيصًا.",l5a:"وقتك هو ",l5g:"عملة",l5b:".",meta:"مشروع سري قيد التطوير. الإطلاق قريبًا.",cta:"اطلب وصول مبكر",tag:"حارس بوابة العالم",modalTitle:"اطلب وصول مبكر",modalSub:"أنت على بعد خطوة واحدة من مستقبل الاتصالات. سيتم دعوة مجموعة مختارة فقط لتجربة PinGate أولاً.",labName:"الاسم",labEmail:"البريد الإلكتروني",labOrg:"المنظمة (اختياري)",labWhy:"لماذا تريد وصول مبكر؟ (اختياري)",submit:"إرسال الطلب",dir:"rtl"},
+      he:{strap:"שומר הסף הגלובלי של התקשורת",heroL:"הזמן שלך. ",heroG:"שמורה.",l1:"חזית חדשה בתקשורת הדיגיטלית.",l2:"לא עוד מסנן. לא עוד תיבת דואר נכנס.",l3a:"",l3g:"שינוי פרדיגמה",l3b:" באופן שבו העולם מתחבר.",l4:"הגישה אינה עוד בחינם. תשומת הלב אינה עוד זולה.",l5a:"הזמן שלך הוא ",l5g:"מטבע",l5b:".",meta:"פרויקט חסוי בפיתוח. השקה בקרוב.",cta:"בקש גישה מוקדמת",tag:"שומר הסף של העולם",modalTitle:"בקש גישה מוקדמת",modalSub:"אתה צעד אחד קרוב יותר לעתיד התקשורת. רק קבוצה נבחרת תוזמן לחוות את PinGate תחילה.",labName:"שם",labEmail:"אימייל",labOrg:"ארגון (רשות)",labWhy:"למה אתה רוצה גישה מוקדמת? (רשות)",submit:"שלח בקשה",dir:"rtl"},
+      hi:{strap:"वैश्विक संचार का द्वारपाल",heroL:"आपका समय। ",heroG:"सुरक्षित।",l1:"डिजिटल संचार में एक नई सीमा।",l2:"न एक और फ़िल्टर। न एक और इनबॉक्स।",l3a:"दुनिया को जोड़ने के तरीके में ",l3g:"एक प्रतिमान बदलाव",l3b:"।",l4:"पहुंच अब मुफ्त नहीं है। ध्यान अब सस्ता नहीं है।",l5a:"आपका समय ही ",l5g:"मुद्रा",l5b:" है।",meta:"गोपनीय परियोजना विकास में। जल्द ही लॉन्च होगा।",cta:"जल्दी पहुँच का अनुरोध करें",tag:"दुनिया का द्वारपाल",modalTitle:"जल्दी पहुँच का अनुरोध करें",modalSub:"आप संचार के भविष्य से सिर्फ एक कदम दूर हैं। केवल चुने हुए लोगों को ही PinGate का अनुभव करने के लिए आमंत्रित किया जाएगा।",labName:"नाम",labEmail:"ईमेल",labOrg:"संगठन (वैकल्पिक)",labWhy:"आप जल्दी पहुँच क्यों चाहते हैं? (वैकल्पिक)",submit:"अनुरोध सबमिट करें",dir:"ltr"}
+    };
+
+    // Language switching
+    const langPanel = document.getElementById('langPanel');
+    const openLang = document.getElementById('openLang');
+    const wrap = document.getElementById('wrap');
+
+    openLang.addEventListener('click', ()=>{
+      langPanel.classList.toggle('open');
+      openLang.setAttribute('aria-expanded', langPanel.classList.contains('open'));
+    });
+    document.querySelectorAll('.lang').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        setLang(btn.dataset.lang);
+        langPanel.classList.remove('open');
+      });
+    });
+
+    function setLang(code){
+      const s=strings[code];
+      document.documentElement.dir=s.dir;
+      document.getElementById('strap').textContent=s.strap;
+      document.getElementById('hero').innerHTML=s.heroL+'<span class="gold">'+s.heroG+'</span>';
+      document.getElementById('l1').textContent=s.l1;
+      document.getElementById('l2').textContent=s.l2;
+      document.getElementById('l3').innerHTML=s.l3a+'<span class="gold">'+s.l3g+'</span>'+s.l3b;
+      document.getElementById('l4').textContent=s.l4;
+      document.getElementById('l5').innerHTML=s.l5a+'<span class="gold">'+s.l5g+'</span>'+s.l5b;
+      document.getElementById('meta1').textContent=s.meta;
+      document.getElementById('openEA').textContent=s.cta;
+      document.getElementById('tagline').textContent=s.tag;
+      document.getElementById('eaTitle').textContent=s.modalTitle;
+      document.getElementById('eaSub').textContent=s.modalSub;
+      document.getElementById('labName').textContent=s.labName;
+      document.getElementById('labEmail').textContent=s.labEmail;
+      document.getElementById('labOrg').textContent=s.labOrg;
+      document.getElementById('labWhy').textContent=s.labWhy;
+      document.getElementById('btnSubmit').textContent=s.submit;
+    }
+
+    // Modal open/close
+    const openEA=document.getElementById('openEA');
+    const modal=document.getElementById('eaModal');
+    const closeEA=document.getElementById('eaClose');
+    const form=document.getElementById('eaForm');
+    const msg=document.getElementById('eaMsg');
+
+    function open(){modal.classList.add('open'); modal.setAttribute('aria-hidden','false');}
+    function close(){modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); msg.textContent=''; form.reset();}
+    openEA?.addEventListener('click',open);
+    closeEA?.addEventListener('click',close);
+    modal.addEventListener('click',e=>{if(e.target===modal)close();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+
+    // Form submit
+    form?.addEventListener('submit',async e=>{
+      e.preventDefault();
+      msg.textContent='Sending…';
+      const data=new FormData(form);
+      try{
+        const r=await fetch(form.action,{method:'POST',headers:{'Accept':'application/json'},body:data});
+        if(r.ok){
+          msg.innerHTML='<span style="color:#CDA349">Request received. If selected, you’ll be among the first to pass through the Gate.</span>';
+          setTimeout(close,1600);
+        }else msg.textContent='Something went wrong. Please try again.';
+      }catch(err){msg.textContent='Network error. Please try again.';}
+    });
+  </script>
+</body>
+</html>
